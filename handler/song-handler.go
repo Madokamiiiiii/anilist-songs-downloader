@@ -2,12 +2,11 @@ package handler
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
+	"github.com/blockloop/scan"
 	_ "github.com/mattn/go-sqlite3"
-	"golang.org/x/exp/slices"
+	"log"
 	"main/structs"
-	"os"
 )
 
 var songInformations []structs.SongInformation
@@ -29,7 +28,7 @@ func convertAnimethemeToSongInformation(informations structs.AnimeInformations) 
 		}
 
 		songInformation := structs.SongInformation{
-			ID:         animetheme.Song.ID,
+			Id:         animetheme.Song.ID,
 			Title:      animetheme.Song.Title,
 			Artist:     artist,
 			AnimeTitle: animeTitle,
@@ -43,64 +42,62 @@ func convertAnimethemeToSongInformation(informations structs.AnimeInformations) 
 	}
 }
 
-func ConvertAndSaveAnimethemesToSongInformation(informations []structs.AnimeInformations) {
-	initDB()
+func ConvertAnimethemesToSongInformation(informations []structs.AnimeInformations) {
 
 	for _, information := range informations {
 		convertAnimethemeToSongInformation(information)
 	}
-
-	saveToFile()
 }
 
 func AddToMALList(id int) {
 	malList = append(malList, id)
 }
 
-func saveToFile() {
-	var savedInformations []structs.SongInformation
-
-	savedFile, err := os.ReadFile("test.json")
-	if err != nil {
-		fmt.Println(err.Error())
-	} else {
-		err = json.Unmarshal(savedFile, &savedInformations)
-	}
-
-	var existingSongIds []int
-	for _, information := range savedInformations {
-		existingSongIds = append(existingSongIds, information.ID)
-	}
-
-	for _, information := range songInformations {
-		if !slices.Contains(existingSongIds, information.ID) {
-			savedInformations = append(savedInformations, information)
-		}
-	}
-
-	file, _ := json.MarshalIndent(savedInformations, "", " ")
-
-	err = os.WriteFile("test.json", file, 0644)
+func InitDB() {
+	database, _ := sql.Open("sqlite3", "./songs.db")
+	_, err := database.Exec("CREATE TABLE IF NOT EXISTS SongInformation (`id` INTEGER PRIMARY KEY, `title` VARCHAR(255) NOT NULL, `animetitle` VARCHAR(255) NOT NULL, `artist` VARCHAR(255) NULL, `type` VARCHAR(20) NOT NULL, `sequence` INTEGER NOT NULL, `downloaded` SMALLINT, `url` VARCHAR)")
 	checkErr(err)
-}
 
-func initDB() {
-	db, err := sql.Open("sqlite3", "./songs.db")
-	if err != nil {
-		os.Create("./songs.db")
-		db, err = sql.Open("sqlite3", "./songs.db")
-		_, err = db.Exec("CREATE TABLE IF NOT EXISTS SongInformation (`id` INTEGER PRIMARY KEY, `title` VARCHAR(255) NOT NULL, `artist` VARCHAR(255) NULL, `type` VARCHAR(20) NOT NULL, `sequence` INTEGER NOT NULL, `downloaded` SMALLINT, `url` VARCHAR)")
-	}
+	db = database
 }
 
 func addToDB(information structs.SongInformation) {
+	var exists bool
+	if _ = db.QueryRow("SELECT EXISTS(SELECT 1 FROM SongInformation WHERE id=?)", information.Id).Scan(&exists); exists {
+		log.Println(fmt.Sprintf("Entry %v already exists", information.Id))
+	} else {
+		_, err := db.Exec("INSERT INTO SongInformation(id, title, animetitle, artist, type, sequence, downloaded, url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", information.Id, information.Title, information.AnimeTitle, information.Artist, information.Type, information.Sequence, information.Downloaded, information.Url)
+		checkErr(err)
+	}
+}
+
+func getSongInformation(ID int) structs.SongInformation {
 	var songInformation structs.SongInformation
-	err := db.QueryRow("SELECT ID FROM SongInformation WHERE ID=" + string(rune(information.ID))).Scan(&songInformation.ID)
+
+	row, err := db.Query("SELECT * FROM SongInformation WHERE Id=?", ID)
 	checkErr(err)
 
-	if songInformation.ID == 0 {
-		db.Exec("INSERT INTO SongInformation")
-	}
+	err = scan.Row(&songInformation, row)
+	checkErr(err)
+
+	return songInformation
+}
+
+func GetAllSongInformations() []structs.SongInformation {
+	var songInformations []structs.SongInformation
+
+	rows, err := db.Query("SELECT * FROM SongInformation")
+	checkErr(err)
+
+	err = scan.Rows(&songInformations, rows)
+	checkErr(err)
+
+	return songInformations
+}
+
+func SaveUrl(id int, url string) {
+	_, err := db.Exec("UPDATE SongInformation SET url = ? WHERE id = ?", url, id)
+	checkErr(err)
 }
 
 func checkErr(err error) {

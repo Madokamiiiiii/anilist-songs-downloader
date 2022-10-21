@@ -3,11 +3,12 @@ package api
 import (
 	"fmt"
 	"github.com/Pauloo27/searchtube"
+	"main/handler"
 	"main/structs"
 	"os"
 )
 
-func GetYoutubeSongUrl(theme structs.SongInformation) string {
+func getYoutubeSongUrl(theme structs.SongInformation) string {
 
 	title := theme.Title
 	artist := theme.Artist
@@ -21,5 +22,13 @@ func GetYoutubeSongUrl(theme structs.SongInformation) string {
 		os.Exit(2)
 	}
 
+	handler.SaveUrl(theme.Id, searchResult[0].URL)
+
 	return searchResult[0].URL
+}
+
+func GetYoutubeSongUrlFromList(themes []structs.SongInformation) {
+	for _, theme := range themes {
+		getYoutubeSongUrl(theme)
+	}
 }

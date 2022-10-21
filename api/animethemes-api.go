@@ -17,10 +17,9 @@ func GetSongsForIdList(anilistIds []int) []structs.AnimeInformations {
 	var animeInformations []structs.AnimeInformations
 
 	for i, id := range anilistIds {
-		animeInformation, error := getSongsForAnime(id)
-		if error != nil {
-			fmt.Println(error.Error())
-			//handler.AddToMALList(id)
+		animeInformation, err := getSongsForAnime(id)
+		if err != nil {
+			fmt.Println(err.Error())
 		} else {
 			animeInformations = append(animeInformations, animeInformation)
 		}

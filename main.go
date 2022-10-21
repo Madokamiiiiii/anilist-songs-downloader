@@ -1,22 +1,26 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"main/api"
 	"main/handler"
 )
 
 func main() {
+	handler.InitDB()
 
-	fmt.Println("Getting animeIds from AniList...")
+	log.Println("Getting animeIds from AniList...")
 	aniListIds := api.GetAnimesFromAniListUser("Youmukami")
 
-	fmt.Println("Getting song informations from Animethemes...")
+	log.Println("Getting song informations from Animethemes...")
 	res := api.GetSongsForIdList(aniListIds)
 
-	fmt.Println("Converting and saving...")
-	handler.ConvertAndSaveAnimethemesToSongInformation(res)
+	log.Println("Converting and saving...")
+	handler.ConvertAnimethemesToSongInformation(res)
 
-	fmt.Println("Downloading...")
+	log.Println("Getting urls...")
+	api.GetYoutubeSongUrlFromList(handler.GetAllSongInformations())
+
+	log.Println("Downloading...")
 	// downloadSongsFromAnime(res[0])
 }

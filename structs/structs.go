@@ -33,12 +33,12 @@ type AnimeInformations struct {
 }
 
 type SongInformation struct {
-	ID         int
+	Id         int
 	Title      string
 	Artist     string
-	AnimeTitle string
+	AnimeTitle string `db:"animetitle"`
 	Type       string
 	Sequence   int
 	Downloaded bool
-	URL        string
+	Url        string
 }

@@ -7,16 +7,16 @@ import (
 )
 
 func GetAnimesFromAniListUser(username string) []int {
-	userId, error := anilist.GetUser(username)
+	userId, err := anilist.GetUser(username)
 
-	if error != nil {
-		fmt.Errorf(error.Error())
+	if err != nil {
+		fmt.Errorf(err.Error())
 	}
 
-	animeList, error := anilist.GetAnimeList(userId.ID)
+	animeList, err := anilist.GetAnimeList(userId.ID)
 
-	if error != nil {
-		fmt.Errorf(error.Error())
+	if err != nil {
+		fmt.Errorf(err.Error())
 	}
 
 	var completedList []*anilist.AnimeListItem
@@ -33,7 +33,7 @@ func GetAnimesFromAniListUser(username string) []int {
 
 	for _, listItem := range completedList {
 		if listItem.Anime.MALID == 0 {
-			fmt.Printf("No MAL ID for AL ID %v", listItem.Anime.ID)
+			fmt.Printf("No MAL Id for AL Id %v", listItem.Anime.ID)
 		} else {
 			animeIds = append(animeIds, listItem.Anime.MALID)
 		}

@@ -24,7 +24,7 @@ var sampleSongInformation2 = structs.SongInformation{
 	AnimeTitle: "Symphogear G",
 	Type:       "OP",
 	Sequence:   1,
-	Downloaded: false,
+	Downloaded: true,
 	Url:        "",
 }
 
@@ -81,7 +81,7 @@ func Test_getAllSongInformations(t *testing.T) {
 
 	t.Run("TestCorrectSave", func(t *testing.T) {
 		if got := GetAllSongInformations(); !reflect.DeepEqual(got, wantedInformations) {
-			t.Errorf("getSongInformation() = %v, want %v", got, wantedInformations)
+			t.Errorf("GetAllSongInformations() = %v, want %v", got, wantedInformations)
 		}
 	})
 }
@@ -94,7 +94,21 @@ func TestSaveUrl(t *testing.T) {
 	SaveUrl(0, url)
 
 	if got := getSongInformation(0); got.Url != url {
-		t.Errorf("getSongInformation() = %v, want %v", got.Url, url)
+		t.Errorf("saveUrl() = %v, want %v", got.Url, url)
+	}
+
+}
+
+func TestGetNotDownloadedSongs(t *testing.T) {
+
+	InitDB()
+	addToDB(sampleSongInformation)
+	addToDB(sampleSongInformation2)
+
+	var wantedInformations = []structs.SongInformation{sampleSongInformation}
+
+	if got := GetNotDownloadedSongs(); !reflect.DeepEqual(got, wantedInformations) {
+		t.Errorf("getNotDownloadedSongs() = %v, want %v", got, wantedInformations)
 	}
 
 }

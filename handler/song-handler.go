@@ -100,6 +100,18 @@ func SaveUrl(id int, url string) {
 	checkErr(err)
 }
 
+func GetNotDownloadedSongs() []structs.SongInformation {
+	var songInformations []structs.SongInformation
+
+	rows, err := db.Query("SELECT * FROM SongInformation WHERE downloaded=0")
+	checkErr(err)
+
+	err = scan.Rows(&songInformations, rows)
+	checkErr(err)
+
+	return songInformations
+}
+
 func checkErr(err error) {
 	if err != nil {
 		panic(err)

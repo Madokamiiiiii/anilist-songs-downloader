@@ -22,5 +22,5 @@ func main() {
 	api.GetYoutubeSongUrlFromList(handler.GetAllSongInformations())
 
 	log.Println("Downloading...")
-	// downloadSongsFromAnime(res[0])
+	handler.DownloadSongs(handler.GetNotDownloadedSongs())
 }

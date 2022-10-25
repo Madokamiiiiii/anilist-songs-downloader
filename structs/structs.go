@@ -14,7 +14,8 @@ type Animethemes struct {
 
 type AnimeInformations struct {
 	Anime []struct {
-		Name        string        `json:"name"`
+		Name        string `json:"name"`
+		Id          int
 		Animethemes []Animethemes `json:"animethemes"`
 	} `json:"anime"`
 	Links struct {
@@ -37,6 +38,7 @@ type SongInformation struct {
 	Title      string
 	Artist     string
 	AnimeTitle string `db:"animetitle"`
+	AnimeId    string `db:"animeid"`
 	Type       string
 	Sequence   int
 	Downloaded bool

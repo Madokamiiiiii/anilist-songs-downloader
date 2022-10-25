@@ -61,5 +61,7 @@ func getSongsForAnime(anilistId int) (structs.AnimeInformations, error) {
 		return information, fmt.Errorf("anime not found on Animethemes for the id %v", anilistId)
 	}
 
+	information.Anime[0].Id = anilistId
+
 	return information, nil
 }

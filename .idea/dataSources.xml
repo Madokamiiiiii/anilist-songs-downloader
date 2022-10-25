@@ -19,7 +19,7 @@
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:C:\Users\fabia\GolandProjects\anilist-songs-downloader\songs.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/songs.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
       <libraries>
         <library>

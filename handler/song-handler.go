@@ -7,6 +7,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"main/structs"
+	"strconv"
 )
 
 var songInformations []structs.SongInformation
@@ -32,6 +33,7 @@ func convertAnimethemeToSongInformation(informations structs.AnimeInformations) 
 			Title:      animetheme.Song.Title,
 			Artist:     artist,
 			AnimeTitle: animeTitle,
+			AnimeId:    strconv.Itoa(informations.Anime[0].Id),
 			Type:       animetheme.Type,
 			Sequence:   animetheme.Sequence,
 		}
@@ -55,7 +57,7 @@ func AddToMALList(id int) {
 
 func InitDB() {
 	database, _ := sql.Open("sqlite3", "./songs.db")
-	_, err := database.Exec("CREATE TABLE IF NOT EXISTS SongInformation (`id` INTEGER PRIMARY KEY, `title` VARCHAR(255) NOT NULL, `animetitle` VARCHAR(255) NOT NULL, `artist` VARCHAR(255) NULL, `type` VARCHAR(20) NOT NULL, `sequence` INTEGER NOT NULL, `downloaded` SMALLINT, `url` VARCHAR)")
+	_, err := database.Exec("CREATE TABLE IF NOT EXISTS SongInformation (`id` INTEGER PRIMARY KEY, `title` VARCHAR(255) NOT NULL, `animetitle` VARCHAR(255) NOT NULL, `animeid` INTEGER, `artist` VARCHAR(255) NULL, `type` VARCHAR(20) NOT NULL, `sequence` INTEGER NOT NULL, `downloaded` SMALLINT, `url` VARCHAR)")
 	checkErr(err)
 
 	db = database
@@ -66,7 +68,7 @@ func addToDB(information structs.SongInformation) {
 	if _ = db.QueryRow("SELECT EXISTS(SELECT 1 FROM SongInformation WHERE id=?)", information.Id).Scan(&exists); exists {
 		log.Println(fmt.Sprintf("Entry %v already exists", information.Id))
 	} else {
-		_, err := db.Exec("INSERT INTO SongInformation(id, title, animetitle, artist, type, sequence, downloaded, url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", information.Id, information.Title, information.AnimeTitle, information.Artist, information.Type, information.Sequence, information.Downloaded, information.Url)
+		_, err := db.Exec("INSERT INTO SongInformation(id, title, animetitle, animeid, artist, type, sequence, downloaded, url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", information.Id, information.Title, information.AnimeTitle, information.AnimeId, information.Artist, information.Type, information.Sequence, information.Downloaded, information.Url)
 		checkErr(err)
 	}
 }

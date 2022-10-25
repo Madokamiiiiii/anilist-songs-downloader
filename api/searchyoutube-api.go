@@ -1,29 +1,46 @@
 package api
 
 import (
-	"fmt"
 	"github.com/Pauloo27/searchtube"
+	"log"
 	"main/handler"
 	"main/structs"
-	"os"
+	"strconv"
 	"time"
 )
 
 func getYoutubeSongUrl(theme structs.SongInformation) string {
-
+	var searchResult []*searchtube.SearchResult
+	var duration time.Duration = 0
 	title := theme.Title
-	// artist := theme.Artist
-	// searchTerm := title + " " + artist
-
-	fmt.Println(title) // Just the title seems to be more accurate
-
-	searchResult, err := searchtube.Search(title, 1)
-	if err != nil {
-		err.Error()
-		os.Exit(2)
+	var animeId, _ = strconv.ParseInt(theme.AnimeId, 10, 0)
+	animeTitle := GetEnglishTitle(int(animeId))
+	if animeTitle == "" {
+		animeTitle = theme.AnimeTitle
 	}
 
-	if searchResult[0].GetDuration() > time.ParseDuration("10m") {
+	artist := theme.Artist
+
+	if artist != "" {
+		searchTerm := title + " " + artist
+		searchResult, _ = searchtube.Search(searchTerm, 1)
+		log.Println("Opt 1: " + searchResult[0].URL)
+		duration, _ = searchResult[0].GetDuration()
+	}
+
+	if duration.Minutes() > 10 || duration.Seconds() < 120 {
+
+		searchTerm := title + " " + animeTitle
+		searchResult, _ = searchtube.Search(searchTerm, 1)
+		log.Println("Opt 2: " + searchTerm + searchResult[0].URL)
+		duration, _ = searchResult[0].GetDuration()
+
+		if duration.Minutes() > 10 || duration.Seconds() < 120 {
+			songType := theme.Type
+			searchTerm := animeTitle + " " + songType + " Full"
+			searchResult, _ = searchtube.Search(searchTerm, 1)
+			log.Println(searchTerm + " " + searchResult[0].URL)
+		}
 
 	}
 

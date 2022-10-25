@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"github.com/animenotifier/anilist"
+	"log"
 	"reflect"
 )
 
@@ -33,7 +34,7 @@ func GetAnimesFromAniListUser(username string) []int {
 
 	for _, listItem := range completedList {
 		if listItem.Anime.MALID == 0 {
-			fmt.Printf("No MAL Id for AL Id %v", listItem.Anime.ID)
+			log.Printf("No MAL Id for AL Id %v\n", listItem.Anime.ID)
 		} else {
 			animeIds = append(animeIds, listItem.Anime.MALID)
 		}

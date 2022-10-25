@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-const BASE_URL = "https://api.animethemes.moe/anime?"
+const BaseUrl = "https://api.animethemes.moe/anime?"
 const FILTER = "filter[has]=resources&include=animethemes.song&include=animethemes.song.artists&fields[anime]=name&fields[artist]=name&fields[animetheme]=type,sequence&fields[song]=id,title&filter[site]=MyAnimeList&filter[external_id]=%v"
 
 func GetSongsForIdList(anilistIds []int) []structs.AnimeInformations {
@@ -19,12 +19,12 @@ func GetSongsForIdList(anilistIds []int) []structs.AnimeInformations {
 	for i, id := range anilistIds {
 		animeInformation, err := getSongsForAnime(id)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Println(err.Error())
 		} else {
 			animeInformations = append(animeInformations, animeInformation)
 		}
 
-		fmt.Println(i)
+		log.Println(i)
 		if i == 5 {
 			break
 		}
@@ -34,27 +34,26 @@ func GetSongsForIdList(anilistIds []int) []structs.AnimeInformations {
 }
 
 func getSongsForAnime(anilistId int) (structs.AnimeInformations, error) {
-	requestURL := fmt.Sprintf(BASE_URL+FILTER, anilistId)
+	requestURL := fmt.Sprintf(BaseUrl+FILTER, anilistId)
 
 	response, err := http.Get(requestURL)
 
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Print(err.Error())
 		os.Exit(1)
 	}
 
 	responseData, err := io.ReadAll(response.Body)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
 	information := structs.AnimeInformations{}
 
 	err = json.Unmarshal(responseData, &information)
 	if err != nil {
-		fmt.Println("Could not decode response")
-		os.Exit(2)
+		log.Fatalln("Could not decode response")
 	}
 
 	if len(information.Anime) == 0 {

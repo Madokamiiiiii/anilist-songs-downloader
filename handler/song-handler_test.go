@@ -14,7 +14,7 @@ var sampleSongInformation = structs.SongInformation{
 	Type:       "OP",
 	Sequence:   1,
 	Downloaded: false,
-	Url:        "",
+	Url:        "https://youtube.com/watch?v=7lrw8VeBldc",
 }
 
 var sampleSongInformation2 = structs.SongInformation{

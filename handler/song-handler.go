@@ -98,7 +98,37 @@ func GetAllSongInformations() []structs.SongInformation {
 }
 
 func SaveUrl(id int, url string) {
-	_, err := db.Exec("UPDATE SongInformation SET url = ? WHERE id = ?", url, id)
+	var oldUrl string
+	row, err := db.Query("SELECT url FROM SongInformation WHERE ID = ?", id)
+	checkErr(err)
+
+	err = scan.Row(&oldUrl, row)
+	checkErr(err)
+
+	if oldUrl == url {
+		return
+	} else if oldUrl != url {
+		var confirm string
+
+		log.Printf("New URL detected. Old: %v, New: %v\n", oldUrl, url)
+		log.Println("Would you like to use the new video? [Y]/N")
+		_, err := fmt.Scanln(&confirm)
+		if err != nil {
+			checkErr(err)
+		}
+
+		if confirm == "n" || confirm == "N" {
+			return
+		}
+		SaveDownloaded(id, false)
+	}
+
+	_, err = db.Exec("UPDATE SongInformation SET url = ? WHERE id = ?", url, id)
+	checkErr(err)
+}
+
+func SaveDownloaded(id int, saved bool) {
+	_, err := db.Exec("UPDATE SongInformation SET downloaded = ? WHERE id = ?", saved, id)
 	checkErr(err)
 }
 

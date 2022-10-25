@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/darenliang/jikan-go"
 	"log"
 	"os"
@@ -12,10 +11,10 @@ import (
 func getSongInformationFromMAL(malId int) {
 	themes, err := jikan.GetAnimeThemes(malId)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 		os.Exit(2)
 	}
-	fmt.Println(themes)
+	log.Println(themes)
 }
 
 func getSongInformationFromMALIds(malIds []int) {

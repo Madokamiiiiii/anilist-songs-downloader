@@ -44,3 +44,8 @@ type SongInformation struct {
 	Downloaded bool
 	Url        string
 }
+
+type AniListInformation struct {
+	Id         int
+	AnimeTitle string
+}

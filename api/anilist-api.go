@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"github.com/animenotifier/anilist"
 	"log"
+	"main/structs"
 	"reflect"
 )
 
-func GetAnimesFromAniListUser(username string) []int {
+func GetAnimesFromAniListUser(username string) []structs.AniListInformation {
+	var anilistInformation []structs.AniListInformation
 	userId, err := anilist.GetUser(username)
 
 	if err != nil {
@@ -30,15 +32,16 @@ func GetAnimesFromAniListUser(username string) []int {
 		}
 	}
 
-	var animeIds []int
-
 	for _, listItem := range completedList {
 		if listItem.Anime.MALID == 0 {
 			log.Printf("No MAL Id for AL Id %v\n", listItem.Anime.ID)
 		} else {
-			animeIds = append(animeIds, listItem.Anime.MALID)
+			anilistInformation = append(anilistInformation, structs.AniListInformation{
+				Id:         listItem.Anime.MALID,
+				AnimeTitle: listItem.Anime.Title.English,
+			})
 		}
 	}
 
-	return animeIds
+	return anilistInformation
 }

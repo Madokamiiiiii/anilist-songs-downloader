@@ -22,6 +22,11 @@ func main() {
 				Usage:    "anilist username",
 				Required: true,
 			},
+			&cli.BoolFlag{
+				Name:  "rescan",
+				Value: false,
+				Usage: "whether to fetch information again from animethemes",
+			},
 		},
 		Action: func(cCtx *cli.Context) error {
 			fmt.Println("Hello friend!")
@@ -30,10 +35,10 @@ func main() {
 			aniListIds := api.GetAnimesFromAniListUser(cCtx.String("username"))
 
 			log.Println("Getting song informations from Animethemes...")
-			res := api.GetSongsForIdList(aniListIds)
+			res, malList := api.GetSongs(aniListIds)
 
 			log.Println("Converting and saving...")
-			handler.ConvertAnimethemesToSongInformation(res)
+			handler.ConvertAnimethemesToSongInformation(res, malList)
 
 			log.Println("Getting urls...")
 			api.GetYoutubeSongUrlFromList(handler.GetAllSongInformations())

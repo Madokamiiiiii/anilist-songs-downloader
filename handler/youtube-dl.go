@@ -59,5 +59,9 @@ func downloadSong(information structs.SongInformation) {
 		log.Println(err)
 	}
 
-	SaveDownloaded(information.Id, true)
+	if information.Id == 0 {
+		SaveMALDownloaded(information.Title, true)
+	} else {
+		SaveDownloaded(information.Id, true)
+	}
 }

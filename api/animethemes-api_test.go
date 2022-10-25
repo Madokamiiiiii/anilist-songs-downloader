@@ -18,7 +18,7 @@ func Test_getSongsForAnime(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, _ := getSongsForAnime(tt.args.anilistId)
+			result, _ := GetSongsForAnime(tt.args.anilistId)
 			if result.Anime[0].Name != tt.wanted {
 				t.Errorf("wanted: %v, got: %v", tt.wanted, result.Anime[0].Name)
 			}

@@ -13,11 +13,12 @@ func getYoutubeSongUrl(theme structs.SongInformation) string {
 	var searchResult []*searchtube.SearchResult
 	var duration time.Duration = 0
 	title := theme.Title
-	var animeId, _ = strconv.ParseInt(theme.AnimeId, 10, 0)
-	animeTitle := GetEnglishTitle(int(animeId))
-	if animeTitle == "" {
-		animeTitle = theme.AnimeTitle
-	}
+	// var animeId, _ = strconv.ParseInt(theme.AnimeId, 10, 0)
+	// animeTitle := mal.GetEnglishTitle(int(animeId))
+	animeTitle := theme.AnimeTitle
+	// if animeTitle == "" {
+	//	animeTitle = theme.AnimeTitle
+	// }
 
 	artist := theme.Artist
 
@@ -49,8 +50,11 @@ func getYoutubeSongUrl(theme structs.SongInformation) string {
 		}
 
 	}
-
-	handler.SaveUrl(theme.Id, searchResult[0].URL)
+	if theme.Id == 0 {
+		handler.SaveMALUrl(theme.Title, searchResult[0].URL)
+	} else {
+		handler.SaveUrl(theme.Id, searchResult[0].URL)
+	}
 
 	return searchResult[0].URL
 }

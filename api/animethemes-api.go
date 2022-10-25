@@ -13,28 +13,27 @@ import (
 const BaseUrl = "https://api.animethemes.moe/anime?"
 const FILTER = "filter[has]=resources&include=animethemes.song&include=animethemes.song.artists&fields[anime]=name&fields[artist]=name&fields[animetheme]=type,sequence&fields[song]=id,title&filter[site]=MyAnimeList&filter[external_id]=%v"
 
-func GetSongsForIdList(anilistIds []int) []structs.AnimeInformations {
+func GetSongs(anilistInformation []structs.AniListInformation) ([]structs.AnimeInformations, []int) {
 	var animeInformations []structs.AnimeInformations
+	var malList []int
 
-	for i, id := range anilistIds {
-		animeInformation, err := getSongsForAnime(id)
+	for i, information := range anilistInformation {
+		animeInformation, err := GetSongsForAnime(information)
 		if err != nil {
 			log.Println(err.Error())
+			malList = append(malList, information.Id)
 		} else {
 			animeInformations = append(animeInformations, animeInformation)
 		}
 
 		log.Println(i)
-		if i == 5 {
-			break
-		}
 	}
 
-	return animeInformations
+	return animeInformations, malList
 }
 
-func getSongsForAnime(anilistId int) (structs.AnimeInformations, error) {
-	requestURL := fmt.Sprintf(BaseUrl+FILTER, anilistId)
+func GetSongsForAnime(anilistInformation structs.AniListInformation) (structs.AnimeInformations, error) {
+	requestURL := fmt.Sprintf(BaseUrl+FILTER, anilistInformation.Id)
 
 	response, err := http.Get(requestURL)
 
@@ -57,10 +56,11 @@ func getSongsForAnime(anilistId int) (structs.AnimeInformations, error) {
 	}
 
 	if len(information.Anime) == 0 {
-		return information, fmt.Errorf("anime not found on Animethemes for the id %v", anilistId)
+		return information, fmt.Errorf("anime not found on Animethemes for the id %v", anilistInformation.Id)
 	}
 
-	information.Anime[0].Id = anilistId
+	information.Anime[0].Id = anilistInformation.Id
+	information.Anime[0].Name = anilistInformation.AnimeTitle
 
 	return information, nil
 }

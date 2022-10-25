@@ -56,14 +56,14 @@ func Test_addToDB(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			addToDB(tt.args.information)
+			addToALDB(tt.args.information)
 		})
 	}
 }
 
 func Test_getSongInformation(t *testing.T) {
 	InitDB()
-	addToDB(sampleSongInformation)
+	addToALDB(sampleSongInformation)
 
 	t.Run("TestCorrectSave", func(t *testing.T) {
 		if got := getSongInformation(0); !reflect.DeepEqual(got, sampleSongInformation) {
@@ -74,8 +74,8 @@ func Test_getSongInformation(t *testing.T) {
 
 func Test_getAllSongInformations(t *testing.T) {
 	InitDB()
-	addToDB(sampleSongInformation)
-	addToDB(sampleSongInformation2)
+	addToALDB(sampleSongInformation)
+	addToALDB(sampleSongInformation2)
 
 	var wantedInformations = []structs.SongInformation{sampleSongInformation, sampleSongInformation2}
 
@@ -90,7 +90,7 @@ func TestSaveUrl(t *testing.T) {
 	url := "test.com"
 
 	InitDB()
-	addToDB(sampleSongInformation)
+	addToALDB(sampleSongInformation)
 	SaveUrl(0, url)
 
 	if got := getSongInformation(0); got.Url != url {
@@ -102,8 +102,8 @@ func TestSaveUrl(t *testing.T) {
 func TestGetNotDownloadedSongs(t *testing.T) {
 
 	InitDB()
-	addToDB(sampleSongInformation)
-	addToDB(sampleSongInformation2)
+	addToALDB(sampleSongInformation)
+	addToALDB(sampleSongInformation2)
 
 	var wantedInformations = []structs.SongInformation{sampleSongInformation}
 
@@ -111,4 +111,23 @@ func TestGetNotDownloadedSongs(t *testing.T) {
 		t.Errorf("getNotDownloadedSongs() = %v, want %v", got, wantedInformations)
 	}
 
+}
+
+func Test_getAndParseMALThemes(t *testing.T) {
+	InitDB()
+
+	type args struct {
+		id int
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"TestMALConverter", args{id: 10721}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			getAndParseMALThemes(tt.args.id)
+		})
+	}
 }

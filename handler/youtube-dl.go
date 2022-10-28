@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	ffmpeg_go "github.com/u2takey/ffmpeg-go"
 	"github.com/wader/goutubedl"
 	"io"
@@ -15,9 +16,15 @@ const videoSaveDirectory = "./video/"
 const audioSaveDirectory = "./audio/"
 
 func DownloadSongs(informations []structs.SongInformation) {
+	initFolders()
 	for _, information := range informations {
 		downloadSong(information)
 	}
+}
+
+func initFolders() {
+	os.Mkdir(videoSaveDirectory, 0750)
+	os.Mkdir(audioSaveDirectory, 0750)
 }
 
 func downloadSong(information structs.SongInformation) {
@@ -25,7 +32,7 @@ func downloadSong(information structs.SongInformation) {
 
 	result, err := goutubedl.New(context.Background(), information.Url, goutubedl.Options{Type: goutubedl.TypeSingle})
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 
 	downloadResult, err := result.Download(context.Background(), "best")
@@ -35,7 +42,28 @@ func downloadSong(information structs.SongInformation) {
 	}
 	defer downloadResult.Close()
 
-	fileName := strings.Replace(result.Info.Title, "/", " ", -1)
+	var fileName string
+	if information.Artist != "" {
+		if information.Sequence == 0 {
+			fileName = fmt.Sprintf("%v %v - %v by %v", information.AnimeTitle, information.Type, information.Title, information.Artist)
+		} else {
+			fileName = fmt.Sprintf("%v %v %v - %v by %v", information.AnimeTitle, information.Type, information.Sequence, information.Title, information.Artist)
+		}
+	} else {
+		if information.Sequence == 0 {
+			fileName = fmt.Sprintf("%v %v - %v", information.AnimeTitle, information.Type, information.Title)
+		} else {
+			fileName = fmt.Sprintf("%v %v %v - %v", information.AnimeTitle, information.Type, information.Sequence, information.Title)
+		}
+	}
+
+	fileName = strings.Replace(fileName, "/", " ", -1)
+	fileName = strings.Replace(fileName, "\\", " ", -1)
+	fileName = strings.Replace(fileName, "*", " ", -1)
+	fileName = strings.Replace(fileName, "|", "", -1)
+	fileName = strings.Replace(fileName, "?", "", -1)
+	fileName = strings.Replace(fileName, ":", " ", -1)
+
 	filePath := videoSaveDirectory + fileName + ".mp4"
 	f, err := os.Create(filePath)
 	if err != nil {

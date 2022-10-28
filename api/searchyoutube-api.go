@@ -19,22 +19,31 @@ func getYoutubeSongUrl(theme structs.SongInformation) string {
 	// if animeTitle == "" {
 	//	animeTitle = theme.AnimeTitle
 	// }
+	log.Printf("Searching songs for %v", theme.AnimeTitle)
 
 	artist := theme.Artist
 
 	if artist != "" {
 		searchTerm := title + " " + artist
 		searchResult, _ = searchtube.Search(searchTerm, 1)
-		log.Println("Opt 1: " + title + " " + artist + " " + searchResult[0].URL)
-		duration, _ = searchResult[0].GetDuration()
+		if len(searchResult) == 0 {
+			log.Printf("No search results for %v", searchTerm)
+		} else {
+			log.Println("Opt 1: " + title + " " + artist + " " + searchResult[0].URL)
+			duration, _ = searchResult[0].GetDuration()
+		}
 	}
 
 	if duration.Minutes() > 10 || duration.Seconds() < 120 {
 
 		searchTerm := title + " " + animeTitle
 		searchResult, _ = searchtube.Search(searchTerm, 1)
-		log.Println("Opt 2: " + searchTerm + " " + searchResult[0].URL)
-		duration, _ = searchResult[0].GetDuration()
+		if len(searchResult) == 0 {
+			log.Printf("No search results for %v", searchTerm)
+		} else {
+			log.Println("Opt 2: " + searchTerm + " " + searchResult[0].URL)
+			duration, _ = searchResult[0].GetDuration()
+		}
 
 		if duration.Minutes() > 10 || duration.Seconds() < 120 {
 			songType := theme.Type
@@ -46,7 +55,16 @@ func getYoutubeSongUrl(theme structs.SongInformation) string {
 			}
 
 			searchResult, _ = searchtube.Search(searchTerm, 1)
-			log.Println("Opt 3: " + searchTerm + " " + searchResult[0].URL)
+			if len(searchResult) == 0 {
+				log.Printf("No search results for %v", searchTerm)
+				return ""
+			} else {
+				log.Println("Opt 3: " + searchTerm + " " + searchResult[0].URL)
+				duration, _ = searchResult[0].GetDuration()
+				if duration.Minutes() > 10 || duration.Seconds() < 120 {
+					return ""
+				}
+			}
 		}
 
 	}

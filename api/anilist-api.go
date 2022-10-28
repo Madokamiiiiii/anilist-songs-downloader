@@ -13,13 +13,15 @@ func GetAnimesFromAniListUser(username string) []structs.AniListInformation {
 	userId, err := anilist.GetUser(username)
 
 	if err != nil {
-		fmt.Errorf(err.Error())
+		err = fmt.Errorf(err.Error())
+		log.Fatalln(err)
 	}
 
 	animeList, err := anilist.GetAnimeList(userId.ID)
 
 	if err != nil {
-		fmt.Errorf(err.Error())
+		err = fmt.Errorf(err.Error())
+		log.Fatalln(err)
 	}
 
 	var completedList []*anilist.AnimeListItem
@@ -36,9 +38,15 @@ func GetAnimesFromAniListUser(username string) []structs.AniListInformation {
 		if listItem.Anime.MALID == 0 {
 			log.Printf("No MAL Id for AL Id %v\n", listItem.Anime.ID)
 		} else {
+			var title string
+			if listItem.Anime.Title.English == "" {
+				title = listItem.Anime.Title.Romaji
+			} else {
+				title = listItem.Anime.Title.English
+			}
 			anilistInformation = append(anilistInformation, structs.AniListInformation{
 				Id:         listItem.Anime.MALID,
-				AnimeTitle: listItem.Anime.Title.English,
+				AnimeTitle: title,
 			})
 		}
 	}

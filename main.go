@@ -25,23 +25,34 @@ func main() {
 			&cli.BoolFlag{
 				Name:  "rescan",
 				Value: false,
-				Usage: "whether to fetch information again from animethemes",
+				Usage: "whether to fetch information again",
+			},
+			&cli.BoolFlag{
+				Name:  "getnew",
+				Value: true,
+				Usage: "whether to only get not downloaded songs",
 			},
 		},
 		Action: func(cCtx *cli.Context) error {
 			fmt.Println("Hello friend!")
 
-			log.Println("Getting animeIds from AniList...")
-			aniListIds := api.GetAnimesFromAniListUser(cCtx.String("username"))
+			if cCtx.Bool("rescan") {
+				log.Println("Getting animeIds from AniList...")
+				aniListIds := api.GetAnimesFromAniListUser(cCtx.String("username"))
 
-			log.Println("Getting song informations from Animethemes...")
-			res, malList := api.GetSongs(aniListIds)
+				log.Println("Getting song informations from Animethemes...")
+				res, malList := api.GetSongs(aniListIds)
 
-			log.Println("Converting and saving...")
-			handler.ConvertAnimethemesToSongInformation(res, malList)
+				log.Println("Converting and saving...")
+				handler.ConvertAnimethemesToSongInformation(res, malList)
+			}
 
 			log.Println("Getting urls...")
-			api.GetYoutubeSongUrlFromList(handler.GetAllSongInformations())
+			if cCtx.Bool("getnew") {
+				api.GetYoutubeSongUrlFromList(handler.GetNotLoadedSongInformations())
+			} else {
+				api.GetYoutubeSongUrlFromList(handler.GetAllSongInformations())
+			}
 
 			log.Println("Downloading...")
 			handler.DownloadSongs(handler.GetNotDownloadedSongs())

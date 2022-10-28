@@ -184,6 +184,25 @@ func GetAllSongInformations() []structs.SongInformation {
 	return append(songInformationsMAL, songInformationsAL...)
 }
 
+func GetNotLoadedSongInformations() []structs.SongInformation {
+	var songInformationsAL []structs.SongInformation
+	var songInformationsMAL []structs.SongInformation
+
+	rows, err := db.Query("SELECT * FROM SongInformation WHERE animetitle = '' OR url = ''")
+	checkErr(err)
+
+	err = scan.Rows(&songInformationsAL, rows)
+	checkErr(err)
+
+	rows, err = db.Query("SELECT * FROM mallist WHERE animetitle = '' OR url = ''")
+	checkErr(err)
+
+	err = scan.Rows(&songInformationsMAL, rows)
+	checkErr(err)
+
+	return append(songInformationsMAL, songInformationsAL...)
+}
+
 func SaveUrl(id int, url string) {
 	var oldUrl string
 	row, err := db.Query("SELECT url FROM SongInformation WHERE ID = ?", id)
@@ -192,22 +211,21 @@ func SaveUrl(id int, url string) {
 	err = scan.Row(&oldUrl, row)
 	checkErr(err)
 
-	if oldUrl == url {
-		return
+	if oldUrl == "" {
+
 	} else if oldUrl != url {
 		var confirm string
 
 		log.Printf("New URL detected. Old: %v, New: %v\n", oldUrl, url)
 		log.Println("Would you like to use the new video? [Y]/N")
-		_, err := fmt.Scanln(&confirm)
-		if err != nil {
-			checkErr(err)
-		}
+		//	_, _ = fmt.Scanln(&confirm)
 
 		if confirm == "n" || confirm == "N" {
 			return
 		}
 		SaveDownloaded(id, false)
+	} else if oldUrl == url {
+		return
 	}
 
 	_, err = db.Exec("UPDATE SongInformation SET url = ? WHERE id = ?", url, id)
@@ -229,7 +247,7 @@ func SaveMALUrl(title string, url string) {
 
 		log.Printf("New URL detected. Old: %v, New: %v\n", oldUrl, url)
 		log.Println("Would you like to use the new video? [Y]/N")
-		_, _ = fmt.Scanln(&confirm)
+		//	_, _ = fmt.Scanln(&confirm)
 
 		if confirm == "n" || confirm == "N" {
 			return
@@ -269,4 +287,9 @@ func checkErr(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func Delete() {
+	db.Exec("DELETE FROM SongInformation WHERE animetitle = '' OR url = ''")
+
 }

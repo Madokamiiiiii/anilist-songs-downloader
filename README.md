@@ -5,9 +5,9 @@ Since the approach is heuristic the results may not be perfect.
 
 ## Prerequisites
 You have to install the following:
-- Go
-- yt-dlp (add to PATH)
-- ffmpeg (add to PATH)
+- Go (https://go.dev)
+- yt-dlp (add to PATH) (https://github.com/yt-dlp/yt-dlp)
+- ffmpeg (add to PATH) (https://ffmpeg.org)
 
 ## Usage
 The CLI has three parameters. You can view these also with `--help`

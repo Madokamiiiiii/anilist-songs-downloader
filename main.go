@@ -24,7 +24,7 @@ func main() {
 			},
 			&cli.BoolFlag{
 				Name:  "rescan",
-				Value: false,
+				Value: true,
 				Usage: "whether to fetch information again",
 			},
 			&cli.BoolFlag{
@@ -38,10 +38,10 @@ func main() {
 
 			if cCtx.Bool("rescan") {
 				log.Println("Getting animeIds from AniList...")
-				aniListIds := api.GetAnimesFromAniListUser(cCtx.String("username"))
+				aniListInformation := api.GetAnimesFromAniListUser(cCtx.String("username"))
 
 				log.Println("Getting song informations from Animethemes...")
-				res, malList := api.GetSongs(aniListIds)
+				res, malList := api.GetSongs(aniListInformation)
 
 				log.Println("Converting and saving...")
 				handler.ConvertAnimethemesToSongInformation(res, malList)

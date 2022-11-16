@@ -62,7 +62,7 @@ func downloadSong(information structs.SongInformation) {
 	fileName = strings.Replace(fileName, "*", " ", -1)
 	fileName = strings.Replace(fileName, "|", "", -1)
 	fileName = strings.Replace(fileName, "?", "", -1)
-	fileName = strings.Replace(fileName, ":", " ", -1)
+	fileName = strings.Replace(fileName, ":", "", -1)
 
 	filePath := videoSaveDirectory + fileName + ".mp4"
 	f, err := os.Create(filePath)

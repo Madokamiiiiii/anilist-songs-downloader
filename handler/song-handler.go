@@ -274,12 +274,22 @@ func SaveMALDownloaded(title string, saved bool) {
 func GetNotDownloadedSongs() []structs.SongInformation {
 	var songInformations []structs.SongInformation
 
+	// AL
 	rows, err := db.Query("SELECT * FROM SongInformation WHERE downloaded=0")
 	checkErr(err)
 
 	err = scan.Rows(&songInformations, rows)
 	checkErr(err)
 
+	// MAL
+	var malSongInformations []structs.SongInformation
+	rows, err = db.Query("SELECT * FROM mallist WHERE downloaded=0")
+	checkErr(err)
+
+	err = scan.Rows(&malSongInformations, rows)
+	checkErr(err)
+
+	songInformations = append(songInformations, malSongInformations...)
 	return songInformations
 }
 

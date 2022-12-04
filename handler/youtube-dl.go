@@ -23,8 +23,8 @@ func DownloadSongs(informations []structs.SongInformation) {
 }
 
 func initFolders() {
-	os.Mkdir(videoSaveDirectory, 0750)
-	os.Mkdir(audioSaveDirectory, 0750)
+	_ = os.Mkdir(videoSaveDirectory, 0750)
+	_ = os.Mkdir(audioSaveDirectory, 0750)
 }
 
 func downloadSong(information structs.SongInformation) {
@@ -32,13 +32,14 @@ func downloadSong(information structs.SongInformation) {
 
 	result, err := goutubedl.New(context.Background(), information.Url, goutubedl.Options{Type: goutubedl.TypeSingle})
 	if err != nil {
+		log.Printf("Skipping: %v\n", information)
 		return
 	}
 
 	downloadResult, err := result.Download(context.Background(), "best")
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	defer downloadResult.Close()
 
@@ -63,6 +64,11 @@ func downloadSong(information structs.SongInformation) {
 	fileName = strings.Replace(fileName, "|", "", -1)
 	fileName = strings.Replace(fileName, "?", "", -1)
 	fileName = strings.Replace(fileName, ":", "", -1)
+	fileName = strings.Replace(fileName, "\"", "", -1)
+
+	if len(fileName) > 100 {
+		fileName = fileName[:100] // Too long for Windows
+	}
 
 	filePath := videoSaveDirectory + fileName + ".mp4"
 	f, err := os.Create(filePath)
@@ -75,7 +81,7 @@ func downloadSong(information structs.SongInformation) {
 		return
 	}
 
-	err = ffmpeg_go.Input(filePath).Output(audioSaveDirectory+fileName+".mp3", ffmpeg_go.KwArgs{"q:a": 0, "map": "0:a:0", "af": "silenceremove=stop_periods=-1:stop_duration=1:stop_threshold=-50dB"}).OverWriteOutput().Run()
+	err = ffmpeg_go.Input(filePath).Output(audioSaveDirectory+fileName+".mp3", ffmpeg_go.KwArgs{"q:a": 0, "map": "0:a:0", "af": "silenceremove=stop_periods=-1:stop_duration=1:stop_threshold=-65dB"}).OverWriteOutput().Run()
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

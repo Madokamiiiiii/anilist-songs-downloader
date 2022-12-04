@@ -217,11 +217,13 @@ func SaveUrl(id int, url string) {
 		var confirm string
 
 		log.Printf("New URL detected. Old: %v, New: %v\n", oldUrl, url)
-		log.Println("Would you like to use the new video? [Y]/N")
-		//	_, _ = fmt.Scanln(&confirm)
+		log.Println("Would you like to use the new video? You can also input your own video link now. [Y]/N")
+		_, _ = fmt.Scanln(&confirm)
 
 		if confirm == "n" || confirm == "N" {
 			return
+		} else if strings.Contains(confirm, "http") {
+			url = confirm
 		}
 		SaveDownloaded(id, false)
 	} else if oldUrl == url {
@@ -246,11 +248,13 @@ func SaveMALUrl(title string, url string) {
 		var confirm string
 
 		log.Printf("New URL detected. Old: %v, New: %v\n", oldUrl, url)
-		log.Println("Would you like to use the new video? [Y]/N")
-		//	_, _ = fmt.Scanln(&confirm)
+		log.Println("Would you like to use the new video? You can also input your own video link now. [Y]/N")
+		_, _ = fmt.Scanln(&confirm)
 
 		if confirm == "n" || confirm == "N" {
 			return
+		} else if strings.Contains(confirm, "http") {
+			url = confirm
 		}
 		SaveMALDownloaded(title, false)
 	} else if oldUrl == url {
@@ -295,7 +299,7 @@ func GetNotDownloadedSongs() []structs.SongInformation {
 
 func checkErr(err error) {
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 }
 
